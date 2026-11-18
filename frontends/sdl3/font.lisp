@@ -248,13 +248,7 @@ configured fonts lack, most preferred first.  Files may not exist."))
         (subseq files 0 (min (length files) *max-fontconfig-fallback-fonts*))))))
 
 (defun probe-font-file (path)
-  "Like PROBE-FILE, but non-nil only when PATH's existence can actually be
-checked.  Some real-world font files (e.g. variable-font releases such as
-\"CascadiaCode[wght].ttf\") contain literal \"[\"/\"]\" characters, which
-SBCL's Unix pathname parser treats as wildcard syntax -- PROBE-FILE on such a
-path signals a file-error (\"wild pathname\") instead of returning NIL, which
-would otherwise take down the whole frontend at startup over one
-unparseable, but perfectly ordinary, filename among the system's fonts."
+  "Like PROBE-FILE, but tolerates filenames (e.g. \"CascadiaCode[wght].ttf\") SBCL treats as wild."
   (ignore-errors (probe-file path)))
 
 (defun system-fallback-font-files ()

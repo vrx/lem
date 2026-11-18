@@ -41,6 +41,7 @@
    :set-frect
    ;; drawing
    :set-render-draw-color
+   :set-render-draw-blend-mode
    :render-clear
    :render-present
    :render-fill-rect
@@ -399,6 +400,10 @@ sampling.  The texture keeps SDL's default blend mode, so alpha is honoured."
 (defun set-render-draw-color (renderer red green blue &optional (alpha 255))
   "Set RENDERER's draw color.  ALPHA defaults to opaque."
   (sdl3:set-render-draw-color renderer red green blue alpha))
+
+(defun set-render-draw-blend-mode (renderer none-p)
+  "NONE-P true writes draw-color alpha straight to the target instead of blending (needed for real window transparency, not just opaque-over-opaque blending)."
+  (sdl3:set-render-draw-blend-mode renderer (list (if none-p :sdl-blendmode-none :sdl-blendmode-blend))))
 
 (defun render-clear (renderer)
   "Fill the current render target with the draw color."

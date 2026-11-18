@@ -288,6 +288,8 @@ box-drawing band, to be stretched to the cell height.  Otherwise NIL."
 
 (defmethod set-render-color ((display display) color &optional (alpha 255))
   (when color
+    ;; BLENDMODE_NONE so alpha<255 writes straight through to the window instead of blending against an opaque destination
+    (lem-sdl3/ffi:set-render-draw-blend-mode (display-renderer display) (< alpha 255))
     (lem-sdl3/ffi:set-render-draw-color (display-renderer display)
                                         (lem:color-red color)
                                         (lem:color-green color)

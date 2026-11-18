@@ -86,7 +86,7 @@
 
 (defmethod render-clear ((view view) display)
   (display::with-display-render-target (display (view-texture view))
-    (display:set-render-color display (display:display-background-color display))
+    (display:set-render-color display (display:display-background-color display) display:*background-alpha*)
     (lem-sdl3/ffi:render-clear (display:display-renderer display))))
 
 (defmethod resize ((view view) display width height)

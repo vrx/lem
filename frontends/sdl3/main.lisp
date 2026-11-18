@@ -12,11 +12,13 @@
                     (:view :lem-sdl3/view)
                     (:event :lem-sdl3/event)
                     (:ffi :lem-sdl3/ffi))
+  (:import-from :lem-sdl3/display :*background-alpha*)
   (:export :change-font
            :set-keyboard-layout
            :render
            :current-renderer
-           :*transparent-window*))
+           :*transparent-window*
+           :*background-alpha*))
 (in-package :lem-sdl3)
 
 (defconstant +display-width+ 100)
@@ -432,7 +434,7 @@ nothing. Can be called from any thread."
         ;; Runs inside with-renderer so textures are destroyed on the main thread.
         (lem-sdl3/text-surface-cache:sweep-if-oversize)
         (ffi:set-render-target (display:display-renderer display) (display:display-texture display))
-        (display:set-render-color display (display:display-background-color display))
+        (display:set-render-color display (display:display-background-color display) display:*background-alpha*)
         (ffi:render-clear (display:display-renderer display))))))
 
 (defun set-input-method (display)

@@ -25,6 +25,7 @@
            :create-view-texture
            :display-renderer
            :set-render-color
+           :*background-alpha*
            :display-background-color
            :display-foreground-color
            :display-texture
@@ -185,7 +186,7 @@ e.g. -3 for NotoSansMono at 12pt). |descent| pixels sit below the baseline."
 
 (defmethod clear ((display display))
   (lem-sdl3/ffi:set-render-target (display-renderer display) (display-texture display))
-  (set-render-color display (display-background-color display))
+  (set-render-color display (display-background-color display) *background-alpha*)
   (lem-sdl3/ffi:render-fill-rect (display-renderer display) nil))
 
 (defun box-drawing-char-p (character)
@@ -282,12 +283,16 @@ box-drawing band, to be stretched to the cell height.  Otherwise NIL."
                                 (display-width display)
                                 (display-height display)))))
 
-(defmethod set-render-color ((display display) color)
+(defvar *background-alpha* 255
+  "Alpha (0-255) used when painting the background color; needs a transparent window to show through.")
+
+(defmethod set-render-color ((display display) color &optional (alpha 255))
   (when color
     (lem-sdl3/ffi:set-render-draw-color (display-renderer display)
                                         (lem:color-red color)
                                         (lem:color-green color)
-                                        (lem:color-blue color))))
+                                        (lem:color-blue color)
+                                        alpha)))
 
 (defun adapt-high-dpi-display-scale (display)
   (with-renderer (display)
@@ -322,7 +327,7 @@ Idempotent."
     (when (display-redraw-at-least-once-p display)
       (setf (display-redraw-at-least-once-p display) nil)
       (lem-sdl3/ffi:set-render-target (display-renderer display) (display-texture display))
-      (set-render-color display (display-background-color display))
+      (set-render-color display (display-background-color display) *background-alpha*)
       (lem-sdl3/ffi:render-clear (display-renderer display))
       #+darwin
       (adapt-high-dpi-display-scale display)
@@ -386,7 +391,7 @@ event handler pattern in `on-windowevent')."
          (x2 (1- (+ x1 (* (+ w 1) (display-char-width display)))))
          (y2 (+ y1 (* (+ h 1) (display-char-height display)))))
     (with-scratch-rect (rect display x1 y1 (- x2 x1) (- y2 y1))
-      (set-render-color display (display-background-color display))
+      (set-render-color display (display-background-color display) *background-alpha*)
       (lem-sdl3/ffi:render-fill-rect (display-renderer display) rect))
     (let ((renderer (display-renderer display)))
       (set-render-color display (display-foreground-color display))

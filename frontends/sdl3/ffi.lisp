@@ -500,11 +500,7 @@ and SDL_ttf."
   (sdl3:set-hint name value))
 
 (defun create-window (title width height &key transparent)
-  "Create a resizable, high-pixel-density window of WIDTH x HEIGHT (in window
-coordinates). TRANSPARENT requests a window with a per-pixel alpha
-channel (SDL_WINDOW_TRANSPARENT) so the desktop compositor shows through
-wherever the renderer draws with alpha < 255, instead of only a uniform,
-whole-frame opacity hint."
+  "Create a resizable, high-pixel-density window; TRANSPARENT adds a real per-pixel alpha channel."
   (let ((window (sdl3:create-window title width height
                                    (if transparent
                                        '(:resizable :high-pixel-density :transparent)

@@ -23,12 +23,7 @@
 (defconstant +display-height+ 40)
 
 (defvar *transparent-window* nil
-  "If non-nil, the Lem window is created with a per-pixel alpha channel
-(SDL_WINDOW_TRANSPARENT), so the desktop compositor shows through
-wherever the renderer draws with alpha < 255. Must be set (e.g. from
-~/.lem/init.lisp with `(setf lem-sdl3:*transparent-window* t)`) before
-the frontend creates its window; toggling it afterward has no effect on
-an already-created window.")
+  "Set before the frontend starts (e.g. in init.lisp) for a per-pixel-transparent window.")
 
 (defun on-mouse-button-down (display button x y clicks)
   (show-cursor)

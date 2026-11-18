@@ -247,13 +247,23 @@ configured fonts lack, most preferred first.  Files may not exist."))
                                                   :remove-empty-subseqs t)))
         (subseq files 0 (min (length files) *max-fontconfig-fallback-fonts*))))))
 
+(defun probe-font-file (path)
+  "Like PROBE-FILE, but non-nil only when PATH's existence can actually be
+checked.  Some real-world font files (e.g. variable-font releases such as
+\"CascadiaCode[wght].ttf\") contain literal \"[\"/\"]\" characters, which
+SBCL's Unix pathname parser treats as wildcard syntax -- PROBE-FILE on such a
+path signals a file-error (\"wild pathname\") instead of returning NIL, which
+would otherwise take down the whole frontend at startup over one
+unparseable, but perfectly ordinary, filename among the system's fonts."
+  (ignore-errors (probe-file path)))
+
 (defun system-fallback-font-files ()
   "Return the existing system font files to fall back to, most preferred
 first.  The result is cached for the session."
   (when (eq *system-fallback-font-files* :unknown)
     (setf *system-fallback-font-files*
           (remove-duplicates
-           (remove-if-not #'probe-file
+           (remove-if-not #'probe-font-file
                           (platform-fallback-font-files
                            (lem-sdl3/platform:get-platform)))
            :test #'equal
@@ -266,7 +276,7 @@ system's) at its size, skipping files that do not exist or fail to open."
   (loop :for file :in (append (font-config-fallback-files font-config)
                               (and (font-config-system-fallback font-config)
                                    (system-fallback-font-files)))
-        :for font := (and (probe-file file)
+        :for font := (and (probe-font-file file)
                           (handler-case (lem-sdl3/ffi:open-font file (font-config-size font-config))
                             (error () nil)))
         :when font

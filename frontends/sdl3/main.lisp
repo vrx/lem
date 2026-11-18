@@ -24,8 +24,8 @@
 (defconstant +display-width+ 100)
 (defconstant +display-height+ 40)
 
-(defvar *transparent-window* nil
-  "Set before the frontend starts (e.g. in init.lisp) for a per-pixel-transparent window.")
+(defvar *transparent-window* (and (uiop:getenv "LEM_TRANSPARENT_WINDOW") t)
+  "Per-pixel-transparent window; read from env var LEM_TRANSPARENT_WINDOW since init.lisp loads too late (after the window already exists) to set this.")
 
 (defun on-mouse-button-down (display button x y clicks)
   (show-cursor)

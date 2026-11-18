@@ -15,11 +15,20 @@
   (:export :change-font
            :set-keyboard-layout
            :render
-           :current-renderer))
+           :current-renderer
+           :*transparent-window*))
 (in-package :lem-sdl3)
 
 (defconstant +display-width+ 100)
 (defconstant +display-height+ 40)
+
+(defvar *transparent-window* nil
+  "If non-nil, the Lem window is created with a per-pixel alpha channel
+(SDL_WINDOW_TRANSPARENT), so the desktop compositor shows through
+wherever the renderer draws with alpha < 255. Must be set (e.g. from
+~/.lem/init.lisp with `(setf lem-sdl3:*transparent-window* t)`) before
+the frontend creates its window; toggling it afterward has no effect on
+an already-created window.")
 
 (defun on-mouse-button-down (display button x y clicks)
   (show-cursor)
@@ -200,7 +209,8 @@ single :windowevent; SDL3 gives each its own event type."
             (char-height (font-char-height font))
             (window-width (* +display-width+ char-width))
             (window-height (* +display-height+ char-height))
-            (window (ffi:create-window "Lem" window-width window-height)))
+            (window (ffi:create-window "Lem" window-width window-height
+                                        :transparent *transparent-window*)))
        (unwind-protect
             (let ((renderer (ffi:create-renderer window)))
               (init-application-icon window)
